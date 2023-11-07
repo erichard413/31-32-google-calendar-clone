@@ -6,6 +6,7 @@ function App() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   return (
     <>
+      <div id="modal-div"></div>
       <Calendar currentMonth={currentMonth} />
     </>
   );
