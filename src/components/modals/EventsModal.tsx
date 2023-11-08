@@ -1,4 +1,3 @@
-import React from "react";
 import { createPortal } from "react-dom";
 import { useEffect, useRef } from "react";
 import { Event } from "../Event";
@@ -6,6 +5,7 @@ import { Event } from "../Event";
 type propTypes = {
   setEventsModalIsOpen: Function;
   setAddDeleteModalIsOpen: Function;
+  setSelectedEvent: Function;
   eventsModalIsOpen: boolean;
   selectedDay: string;
   events: Array<object>;
@@ -14,6 +14,7 @@ type propTypes = {
 export function EventsModal({
   setEventsModalIsOpen,
   selectedDay,
+  setSelectedEvent,
   events,
   setAddDeleteModalIsOpen,
   eventsModalIsOpen,
@@ -51,15 +52,15 @@ export function EventsModal({
           {events?.map(d => (
             <Event
               key={crypto.randomUUID()}
-              time={d.time}
-              name={d.name}
-              color={d.color}
+              event={d}
+              setEventsModalIsOpen={setEventsModalIsOpen}
               setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
+              setSelectedEvent={setSelectedEvent}
             />
           ))}
         </div>
       </div>
     </div>,
-    document.body.querySelector("#modal-div")
+    document.body.querySelector("#modal-div")!
   );
 }

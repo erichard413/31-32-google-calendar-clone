@@ -1,20 +1,29 @@
-import React from "react";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { AddDeleteForm } from "../../forms/AddDeleteForm.tsx";
 
 type propTypes = {
+  event: Object;
+  setSelectedEvent: Function;
   setAddDeleteModalIsOpen: Function;
   addDeleteModalIsOpen: boolean;
+  selectedDay: string;
+  handleDelete: Function;
 };
 
 export function AddDeleteModal({
   setAddDeleteModalIsOpen,
   addDeleteModalIsOpen,
+  setSelectedEvent,
+  selectedDay,
+  handleDelete,
+  event,
 }: propTypes) {
   // add event listener to calendar div, so if user clicks OFF modal the modal will close.
   const modalRef = useRef<any>();
   const handleClose = () => {
     console.log("close modal");
+    setSelectedEvent({});
     setAddDeleteModalIsOpen(false);
   };
   function keyPress(e: KeyboardEvent) {
@@ -38,77 +47,23 @@ export function AddDeleteModal({
       <div className="overlay"></div>
       <div className="modal-body" ref={modalRef}>
         <div className="modal-title">
-          <div>Add Event</div>
-          <small>6/8/23</small>
+          {Object.keys(event).length === 0 ? (
+            <div>Add Event</div>
+          ) : (
+            <div>Edit Event</div>
+          )}
+          <small>{selectedDay.replaceAll("-", "/")}</small>
           <div className="close-btn" onClick={handleClose}>
             &times;
           </div>
         </div>
-        <form>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input type="text" name="name" id="name" />
-          </div>
-          <div className="form-group checkbox">
-            <input type="checkbox" name="all-day" id="all-day" />
-            <label htmlFor="all-day">All Day?</label>
-          </div>
-          <div className="row">
-            <div className="form-group">
-              <label htmlFor="start-time">Start Time</label>
-              <input type="time" name="start-time" id="start-time" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="end-time">End Time</label>
-              <input type="time" name="end-time" id="end-time" />
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Color</label>
-            <div className="row left">
-              <input
-                type="radio"
-                name="color"
-                value="blue"
-                id="blue"
-                className="color-radio"
-              />
-              <label htmlFor="blue">
-                <span className="sr-only">Blue</span>
-              </label>
-              <input
-                type="radio"
-                name="color"
-                value="red"
-                id="red"
-                className="color-radio"
-              />
-              <label htmlFor="red">
-                <span className="sr-only">Red</span>
-              </label>
-              <input
-                type="radio"
-                name="color"
-                value="green"
-                id="green"
-                className="color-radio"
-              />
-              <label htmlFor="green">
-                <span className="sr-only">Green</span>
-              </label>
-            </div>
-          </div>
-          <div className="row">
-            <button className="btn btn-success" type="submit">
-              Add
-            </button>
-            <button className="btn btn-delete" type="button">
-              Delete
-            </button>
-          </div>
-        </form>
+        <AddDeleteForm
+          selectedDay={selectedDay}
+          event={event}
+          handleDelete={handleDelete}
+        />
       </div>
     </div>,
-    document.body.querySelector("#modal-div")
+    document.body.querySelector<Element>("#modal-div")!
   );
 }
