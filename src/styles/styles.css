@@ -60,6 +60,14 @@ body {
 .btn:hover {
   background-color: #f1f3f4;
 }
+.btn.btn-success:disabled {
+  background-color: gray;
+  opacity: 0.2;
+}
+.btn.btn-success:disabled:hover {
+  background-color: gray;
+  opacity: 0.2;
+}
 
 .btn.btn-delete {
   border-color: hsl(0, 75%, 60%);

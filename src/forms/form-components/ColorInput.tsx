@@ -1,9 +1,10 @@
 type propTypes = {
   color: string;
   formColor: string;
+  handleChange: any;
 };
 
-export function ColorInput({ color, formColor }: propTypes) {
+export function ColorInput({ color, formColor, handleChange }: propTypes) {
   return (
     <>
       <input
@@ -11,6 +12,7 @@ export function ColorInput({ color, formColor }: propTypes) {
         name="color"
         value={color}
         id={color}
+        onChange={handleChange}
         className="color-radio"
         checked={!!(formColor == color) ? true : false}
       />

@@ -9,6 +9,8 @@ type propTypes = {
   addDeleteModalIsOpen: boolean;
   selectedDay: string;
   handleDelete: Function;
+  handleAdd: Function;
+  handleUpdate: Function;
 };
 
 export function AddDeleteModal({
@@ -17,12 +19,13 @@ export function AddDeleteModal({
   setSelectedEvent,
   selectedDay,
   handleDelete,
+  handleAdd,
+  handleUpdate,
   event,
 }: propTypes) {
   // add event listener to calendar div, so if user clicks OFF modal the modal will close.
   const modalRef = useRef<any>();
   const handleClose = () => {
-    console.log("close modal");
     setSelectedEvent({});
     setAddDeleteModalIsOpen(false);
   };
@@ -59,8 +62,10 @@ export function AddDeleteModal({
         </div>
         <AddDeleteForm
           selectedDay={selectedDay}
+          handleAdd={handleAdd}
           event={event}
           handleDelete={handleDelete}
+          handleUpdate={handleUpdate}
         />
       </div>
     </div>,

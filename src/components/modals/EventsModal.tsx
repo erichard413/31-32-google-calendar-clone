@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef } from "react";
 import { Event } from "../Event";
+import { sortEvents } from "../../helpers/sortEvents";
 
 type propTypes = {
   setEventsModalIsOpen: Function;
@@ -43,13 +44,13 @@ export function EventsModal({
       <div className="overlay"></div>
       <div className="modal-body" ref={modalRef}>
         <div className="modal-title">
-          {selectedDay}
+          {selectedDay.replaceAll("-", "/")}
           <button className="close-btn" onClick={handleClose}>
             &times;
           </button>
         </div>
         <div className="events">
-          {events?.map(d => (
+          {sortEvents(events)?.map(d => (
             <Event
               key={crypto.randomUUID()}
               event={d}

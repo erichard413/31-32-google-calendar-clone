@@ -10,18 +10,21 @@ import isSameMonth from "date-fns/isSameMonth";
 import isToday from "date-fns/isToday";
 import isPast from "date-fns/isPast";
 import { deleteEvent } from "../helpers/deleteEvent.ts";
+import { addEvent } from "../helpers/addEvent.ts";
+import { updateEvent } from "../helpers/updateEvent.ts";
 import { Event } from "./Event.tsx";
 import { Header } from "./Header.tsx";
 import { useLocalStorage } from "../hooks/useLocalStorage.tsx";
 import { AddDeleteModal } from "./modals/AddDeleteModal.tsx";
 import { EventsModal } from "./modals/EventsModal.tsx";
+import { sortEvents } from "../helpers/sortEvents.ts";
 
 type valueTypes = {
   currentMonth?: Date;
 };
 
-type Event = {
-  id: string;
+type eventTypes = {
+  id?: string;
   color?: string;
   startTime?: string | null;
   endTime?: string | null;
@@ -61,58 +64,70 @@ export function Calendar({ currentMonth }: valueTypes) {
     );
     setAddDeleteModalIsOpen(val => !val);
   }
+
+  function handleAdd(data: eventTypes, key: string) {
+    setEvents(addEvent(data, events, key));
+    setAddDeleteModalIsOpen(val => !val);
+  }
+
+  function handleUpdate(data: eventTypes, key: string) {
+    setEvents(updateEvent(data, events, key));
+    setAddDeleteModalIsOpen(val => !val);
+  }
   // FOR DEV USE ONLY -  useEffect to add in test Event Information
-  useEffect(() => {
-    setEvents({
-      [`${format(new Date(), "L-d-yyyy")}`]: [
-        {
-          id: crypto.randomUUID(),
-          startTime: "09:00",
-          endTime: "10:00",
-          name: "Test",
-          color: "blue",
-          isAllDay: false,
-        },
-        {
-          id: crypto.randomUUID(),
-          startTime: "10:00",
-          endTime: "11:00",
-          name: "Test2",
-          color: "red",
-          isAllDay: false,
-        },
-        {
-          id: crypto.randomUUID(),
-          startTime: "",
-          endTime: "",
-          name: "full-day test",
-          color: "green",
-          isAllDay: true,
-        },
-      ],
-      "10-24-2023": [
-        {
-          id: crypto.randomUUID(),
-          startTime: "",
-          endTime: "",
-          name: "My birthday!",
-          color: "blue",
-          isAllDay: true,
-        },
-      ],
-    });
-  }, []);
+  // useEffect(() => {
+  //   setEvents({
+  //     [`${format(new Date(), "L-d-yyyy")}`]: [
+  //       {
+  //         id: crypto.randomUUID(),
+  //         startTime: "09:00",
+  //         endTime: "10:00",
+  //         name: "Test",
+  //         color: "blue",
+  //         isAllDay: false,
+  //       },
+  //       {
+  //         id: crypto.randomUUID(),
+  //         startTime: "10:00",
+  //         endTime: "11:00",
+  //         name: "Test2",
+  //         color: "red",
+  //         isAllDay: false,
+  //       },
+  //       {
+  //         id: crypto.randomUUID(),
+  //         startTime: "",
+  //         endTime: "",
+  //         name: "full-day test",
+  //         color: "green",
+  //         isAllDay: true,
+  //       },
+  //     ],
+  //     "10-24-2023": [
+  //       {
+  //         id: crypto.randomUUID(),
+  //         startTime: "",
+  //         endTime: "",
+  //         name: "My birthday!",
+  //         color: "blue",
+  //         isAllDay: true,
+  //       },
+  //     ],
+  //   });
+  // }, []);
 
   return (
     <>
       {addDeleteModalIsOpen && (
         <AddDeleteModal
           setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
+          handleAdd={handleAdd}
           addDeleteModalIsOpen={addDeleteModalIsOpen}
           setSelectedEvent={setSelectedEvent}
           selectedDay={selectedDay}
           event={selectedEvent}
           handleDelete={handleDelete}
+          handleUpdate={handleUpdate}
         />
       )}
       {eventsModalIsOpen && (
@@ -153,7 +168,7 @@ export function Calendar({ currentMonth }: valueTypes) {
                 </button>
               </div>
               <div className="events">
-                {events[format(date, "L-d-yyyy")]?.map(
+                {sortEvents(events[format(date, "L-d-yyyy")])?.map(
                   (d: {
                     color?: string | undefined;
                     startTime?: string | null | undefined;
