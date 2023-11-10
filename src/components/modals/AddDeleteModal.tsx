@@ -25,14 +25,16 @@ export function AddDeleteModal({
 }: propTypes) {
   // add event listener to calendar div, so if user clicks OFF modal the modal will close.
   const modalRef = useRef<any>();
-  const handleClose = () => {
-    setSelectedEvent({});
+
+  const handleClose = async () => {
     setAddDeleteModalIsOpen(false);
+    setSelectedEvent({});
   };
   function keyPress(e: KeyboardEvent) {
     if (addDeleteModalIsOpen && e.key === "Escape")
       setAddDeleteModalIsOpen(false);
   }
+
   useEffect(() => {
     const overlay = document.querySelector(".overlay");
     overlay?.addEventListener("click", handleClose);
@@ -46,29 +48,31 @@ export function AddDeleteModal({
   }, []);
 
   return createPortal(
-    <div className="modal">
-      <div className="overlay"></div>
-      <div className="modal-body" ref={modalRef}>
-        <div className="modal-title">
-          {Object.keys(event).length === 0 ? (
-            <div>Add Event</div>
-          ) : (
-            <div>Edit Event</div>
-          )}
-          <small>{selectedDay.replaceAll("-", "/")}</small>
-          <div className="close-btn" onClick={handleClose}>
-            &times;
+    <>
+      <div className="modal" ref={modalRef}>
+        <div className="overlay"></div>
+        <div className="modal-body">
+          <div className="modal-title">
+            {Object.keys(event).length === 0 ? (
+              <div>Add Event</div>
+            ) : (
+              <div>Edit Event</div>
+            )}
+            <small>{selectedDay.replaceAll("-", "/")}</small>
+            <div className="close-btn" onClick={handleClose}>
+              &times;
+            </div>
           </div>
+          <AddDeleteForm
+            selectedDay={selectedDay}
+            handleAdd={handleAdd}
+            event={event}
+            handleDelete={handleDelete}
+            handleUpdate={handleUpdate}
+          />
         </div>
-        <AddDeleteForm
-          selectedDay={selectedDay}
-          handleAdd={handleAdd}
-          event={event}
-          handleDelete={handleDelete}
-          handleUpdate={handleUpdate}
-        />
       </div>
-    </div>,
+    </>,
     document.body.querySelector<Element>("#modal-div")!
   );
 }

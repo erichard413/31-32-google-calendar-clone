@@ -308,7 +308,7 @@ body {
   z-index: 1;
 }
 
-.modal .overlay {
+#modal-div .modal .overlay {
   background-color: transparent;
   width: 100%;
   height: 100%;
@@ -316,7 +316,7 @@ body {
   animation: fade-in 250ms forwards;
 }
 
-.modal.closing .overlay {
+#modal-div .modal.closing .overlay {
   animation: fade-in 250ms forwards reverse;
 }
 
@@ -326,7 +326,7 @@ body {
   }
 }
 
-.modal .modal-body {
+#modal-div .modal .modal-body {
   background-color: white;
   border-radius: 0.5rem;
   padding: 1rem;
@@ -337,7 +337,7 @@ body {
   scale: 0;
 }
 
-.modal.closing .modal-body {
+#modal-div .modal.closing .modal-body {
   animation: pop-in 250ms forwards reverse;
 }
 

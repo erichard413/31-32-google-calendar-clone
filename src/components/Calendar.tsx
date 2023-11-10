@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import format from "date-fns/format";
 import eachDayOfInterval from "date-fns/eachDayOfInterval";
 import startOfWeek from "date-fns/startOfWeek";
@@ -19,10 +19,6 @@ import { AddDeleteModal } from "./modals/AddDeleteModal.tsx";
 import { EventsModal } from "./modals/EventsModal.tsx";
 import { sortEvents } from "../helpers/sortEvents.ts";
 
-type valueTypes = {
-  currentMonth?: Date;
-};
-
 type eventTypes = {
   id?: string;
   color?: string;
@@ -32,9 +28,9 @@ type eventTypes = {
   isAllDay?: boolean;
 };
 
-export function Calendar({ currentMonth }: valueTypes) {
+export function Calendar() {
   // save visible month in state, this can be used to calculate start of month, end of month values.
-  const [visibleMonth, setVisibleMonth] = useState(currentMonth || new Date());
+  const [visibleMonth, setVisibleMonth] = useState(new Date());
   // state for selecting day
   const [selectedDay, setSelectedDay] = useState<string>("");
   // state for selecting event
@@ -43,11 +39,36 @@ export function Calendar({ currentMonth }: valueTypes) {
   const [addDeleteModalIsOpen, setAddDeleteModalIsOpen] =
     useState<boolean>(false);
   const { events, setEvents } = useLocalStorage();
+  // ref for # of displayed events
+  const eventsRef = useRef<any>();
+  const plusMoreRef = useRef<any>();
+  const [numEvents, setNumEvents] = useState<number>(0);
+
   // get visible dates, to build the calendar using fns-dates
   const visibleDates = eachDayOfInterval({
     start: startOfWeek(startOfMonth(visibleMonth)),
     end: endOfWeek(endOfMonth(visibleMonth)),
   });
+
+  function handleResize() {
+    setNumEvents(
+      Math.floor(
+        eventsRef.current.clientHeight /
+          document.querySelector(".event")!.clientHeight -
+          1
+      )
+    );
+  }
+  useEffect(() => {
+    // get HEIGHT of each date div on screen resize
+    let height = document.querySelector(".event")!?.clientHeight || 23;
+    setNumEvents(Math.floor(eventsRef.current.clientHeight / height - 1));
+    window.addEventListener("resize", handleResize);
+    //cleanup function to remove handler! *IMPORTANT*
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   function handleDelete(id: string, key: string) {
     setEvents(
@@ -115,7 +136,7 @@ export function Calendar({ currentMonth }: valueTypes) {
   //     ],
   //   });
   // }, []);
-
+  console.log(numEvents);
   return (
     <>
       {addDeleteModalIsOpen && (
@@ -130,6 +151,7 @@ export function Calendar({ currentMonth }: valueTypes) {
           handleUpdate={handleUpdate}
         />
       )}
+
       {eventsModalIsOpen && (
         <EventsModal
           setEventsModalIsOpen={setEventsModalIsOpen}
@@ -167,34 +189,37 @@ export function Calendar({ currentMonth }: valueTypes) {
                   +
                 </button>
               </div>
-              <div className="events">
-                {sortEvents(events[format(date, "L-d-yyyy")])?.map(
-                  (d: {
-                    color?: string | undefined;
-                    startTime?: string | null | undefined;
-                    endTime?: string | null | undefined;
-                    name?: string | undefined;
-                    isAllDay?: boolean | undefined;
-                  }) => (
-                    <Event
-                      key={crypto.randomUUID()}
-                      event={d}
-                      date={date}
-                      setEventsModalIsOpen={setEventsModalIsOpen}
-                      setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
-                      setSelectedEvent={setSelectedEvent}
-                      setSelectedDay={setSelectedDay}
-                    />
-                  )
-                )}
+              <div className="events" ref={eventsRef}>
+                {sortEvents(events[format(date, "L-d-yyyy")])
+                  ?.slice(0, numEvents)
+                  ?.map(
+                    (d: {
+                      color?: string | undefined;
+                      startTime?: string | null | undefined;
+                      endTime?: string | null | undefined;
+                      name?: string | undefined;
+                      isAllDay?: boolean | undefined;
+                    }) => (
+                      <Event
+                        key={crypto.randomUUID()}
+                        event={d}
+                        date={date}
+                        setEventsModalIsOpen={setEventsModalIsOpen}
+                        setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
+                        setSelectedEvent={setSelectedEvent}
+                        setSelectedDay={setSelectedDay}
+                      />
+                    )
+                  )}
               </div>
-              {events[format(date, "L-d-yyyy")]?.length > 0 ? (
+              {events[format(date, "L-d-yyyy")]?.length > numEvents ? (
                 <button
                   className="events-view-more-btn"
                   onClick={() => {
                     setSelectedDay(format(date, "L-d-yyyy"));
                     setEventsModalIsOpen((val: boolean) => !val);
                   }}
+                  ref={plusMoreRef}
                 >
                   +{events.length} More
                 </button>

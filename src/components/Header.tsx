@@ -9,7 +9,9 @@ type propTypes = {
 export function Header({ visibleMonth, setVisibleMonth }: propTypes) {
   return (
     <div className="header">
-      <button className="btn">Today</button>
+      <button className="btn" onClick={() => setVisibleMonth(new Date())}>
+        Today
+      </button>
       <div>
         <button
           className="month-change-btn"
