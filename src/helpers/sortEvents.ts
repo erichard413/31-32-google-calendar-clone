@@ -1,12 +1,3 @@
-type eventTypes = {
-  id?: string;
-  color?: string;
-  startTime?: string | null;
-  endTime?: string | null;
-  name?: string;
-  isAllDay?: boolean;
-};
-
 export function sortEvents(array: Array<any>) {
   //array will be array of objects containing each event data, sort by start time.
   if (!array) return;
