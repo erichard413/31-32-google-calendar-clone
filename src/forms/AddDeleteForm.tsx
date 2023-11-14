@@ -4,9 +4,11 @@ import { addToTime } from "../helpers/addToTime.ts";
 
 type propTypes = {
   selectedDay: string;
+  setSelectedEvent: Function;
   handleDelete: Function;
   handleAdd: Function;
   handleUpdate: Function;
+  onClose: Function;
   event?:
     | {
         id: string;
@@ -34,7 +36,9 @@ export function AddDeleteForm({
   event,
   handleDelete,
   selectedDay,
+  setSelectedEvent,
   handleUpdate,
+  onClose,
   handleAdd,
 }: propTypes) {
   const initialFormData: formTypes | any =
@@ -96,7 +100,7 @@ export function AddDeleteForm({
       </div>
       <div className="row">
         <div className="form-group">
-          <label htmlFor="startTime">Start Time</label>
+          <label htmlFor="start-time">Start Time</label>
           <input
             type="time"
             name="startTime"
@@ -107,7 +111,7 @@ export function AddDeleteForm({
           />
         </div>
         <div className="form-group">
-          <label htmlFor="endTime">End Time</label>
+          <label htmlFor="end-time">End Time</label>
           <input
             type="time"
             name="endTime"
@@ -141,6 +145,7 @@ export function AddDeleteForm({
               if (formData.startTime > formData.endTime)
                 return alert("Start time must come before End time!");
               handleAdd(formData, selectedDay);
+              onClose();
             }}
             disabled={
               formData.name == "" ||
@@ -162,6 +167,8 @@ export function AddDeleteForm({
               if (formData.startTime > formData.endTime)
                 return alert("Start time must come before End time!");
               handleUpdate(formData, selectedDay);
+              setSelectedEvent({ ...formData });
+              onClose();
             }}
             disabled={
               formData.name == "" ||

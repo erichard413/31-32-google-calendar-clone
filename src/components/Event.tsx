@@ -9,25 +9,30 @@ type propTypes = {
     name?: string;
     isAllDay?: boolean;
   };
-  setAddDeleteModalIsOpen: Function;
   setSelectedEvent: Function;
   setSelectedDay?: Function;
-  setEventsModalIsOpen: Function;
   date?: Date;
+  setSelectedModal: Function;
+  setModalIsOpen: Function;
+  modalIsOpen: boolean;
 };
 
 export function Event({
   event,
-  setAddDeleteModalIsOpen,
   setSelectedEvent,
   setSelectedDay,
+  setSelectedModal,
+  setModalIsOpen,
+  modalIsOpen,
   date,
 }: propTypes) {
   const { color, startTime, isAllDay, name } = event;
+
   function handleClick() {
     setSelectedEvent(event);
     if (setSelectedDay && date) setSelectedDay(format(date, "L-d-yyyy"));
-    setAddDeleteModalIsOpen((val: boolean) => !val);
+    if (!modalIsOpen) setModalIsOpen(true);
+    setSelectedModal("add-delete");
   }
   const ifTime = (
     <button className={`event`} onClick={handleClick}>

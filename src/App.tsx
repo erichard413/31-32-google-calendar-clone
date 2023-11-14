@@ -4,7 +4,6 @@ import { Calendar } from "./components/Calendar";
 function App() {
   return (
     <>
-      <div id="modal-div"></div>
       <Calendar />
     </>
   );

@@ -15,9 +15,10 @@ import { updateEvent } from "../helpers/updateEvent.ts";
 import { Event } from "./Event.tsx";
 import { Header } from "./Header.tsx";
 import { useLocalStorage } from "../hooks/useLocalStorage.tsx";
-import { AddDeleteModal } from "./modals/AddDeleteModal.tsx";
-import { EventsModal } from "./modals/EventsModal.tsx";
+import { ModalContentAddDelete } from "./modals/ModalContentAddDelete.tsx";
+import { ModalContentEvents } from "./modals/ModalContentEvents.tsx";
 import { sortEvents } from "../helpers/sortEvents.ts";
+import { Modal } from "./modals/Modal.tsx";
 
 type eventTypes = {
   id?: string;
@@ -34,10 +35,13 @@ export function Calendar() {
   // state for selecting day
   const [selectedDay, setSelectedDay] = useState<string>("");
   // state for selecting event
-  const [selectedEvent, setSelectedEvent] = useState<Object>("");
-  const [eventsModalIsOpen, setEventsModalIsOpen] = useState<boolean>(false);
-  const [addDeleteModalIsOpen, setAddDeleteModalIsOpen] =
-    useState<boolean>(false);
+  const initialEvent: Object = {};
+  const [selectedEvent, setSelectedEvent] = useState<Object>(initialEvent);
+  // state for selected modal
+  const [selectedModal, setSelectedModal] = useState<
+    "closed" | "add-delete" | "events"
+  >("closed");
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const { events, setEvents } = useLocalStorage();
   // ref for # of displayed events
   const eventsRef = useRef<any>();
@@ -70,6 +74,14 @@ export function Calendar() {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (!modalIsOpen) setSelectedEvent(initialEvent);
+  // }, [modalIsOpen]);
+
+  function handleModalClose() {
+    setModalIsOpen(val => !val);
+  }
+
   function handleDelete(id: string, key: string) {
     setEvents(
       (
@@ -83,85 +95,52 @@ export function Calendar() {
         }[]
       ) => ({ ...e, [key]: deleteEvent(id, key, e) })
     );
-    setAddDeleteModalIsOpen(val => !val);
   }
 
   function handleAdd(data: eventTypes, key: string) {
     setEvents(addEvent(data, events, key));
-    setAddDeleteModalIsOpen(val => !val);
   }
 
   function handleUpdate(data: eventTypes, key: string) {
     setEvents(updateEvent(data, events, key));
-    setAddDeleteModalIsOpen(val => !val);
   }
-  // FOR DEV USE ONLY -  useEffect to add in test Event Information
-  // useEffect(() => {
-  //   setEvents({
-  //     [`${format(new Date(), "L-d-yyyy")}`]: [
-  //       {
-  //         id: crypto.randomUUID(),
-  //         startTime: "09:00",
-  //         endTime: "10:00",
-  //         name: "Test",
-  //         color: "blue",
-  //         isAllDay: false,
-  //       },
-  //       {
-  //         id: crypto.randomUUID(),
-  //         startTime: "10:00",
-  //         endTime: "11:00",
-  //         name: "Test2",
-  //         color: "red",
-  //         isAllDay: false,
-  //       },
-  //       {
-  //         id: crypto.randomUUID(),
-  //         startTime: "",
-  //         endTime: "",
-  //         name: "full-day test",
-  //         color: "green",
-  //         isAllDay: true,
-  //       },
-  //     ],
-  //     "10-24-2023": [
-  //       {
-  //         id: crypto.randomUUID(),
-  //         startTime: "",
-  //         endTime: "",
-  //         name: "My birthday!",
-  //         color: "blue",
-  //         isAllDay: true,
-  //       },
-  //     ],
-  //   });
-  // }, []);
-  console.log(numEvents);
+
   return (
     <>
-      {addDeleteModalIsOpen && (
-        <AddDeleteModal
-          setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
-          handleAdd={handleAdd}
-          addDeleteModalIsOpen={addDeleteModalIsOpen}
-          setSelectedEvent={setSelectedEvent}
-          selectedDay={selectedDay}
-          event={selectedEvent}
-          handleDelete={handleDelete}
-          handleUpdate={handleUpdate}
-        />
-      )}
-
-      {eventsModalIsOpen && (
-        <EventsModal
-          setEventsModalIsOpen={setEventsModalIsOpen}
-          setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
-          setSelectedEvent={setSelectedEvent}
-          selectedDay={selectedDay}
-          events={events[selectedDay]}
-          eventsModalIsOpen={eventsModalIsOpen}
-        />
-      )}
+      <Modal
+        isOpen={modalIsOpen}
+        onClose={() => {
+          handleModalClose();
+        }}
+      >
+        {selectedModal === "events" && (
+          <ModalContentEvents
+            selectedDay={selectedDay}
+            events={events[selectedDay]}
+            onClose={() => {
+              setModalIsOpen(false);
+            }}
+            event={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            setSelectedModal={setSelectedModal}
+            setModalIsOpen={setModalIsOpen}
+            modalIsOpen={modalIsOpen}
+          />
+        )}
+        {selectedModal === "add-delete" && (
+          <ModalContentAddDelete
+            onClose={() => {
+              setModalIsOpen(false);
+            }}
+            handleAdd={handleAdd}
+            handleDelete={handleDelete}
+            handleUpdate={handleUpdate}
+            event={selectedEvent}
+            selectedDay={selectedDay}
+            setSelectedEvent={setSelectedEvent}
+          />
+        )}
+      </Modal>
       <div className="calendar">
         <Header setVisibleMonth={setVisibleMonth} visibleMonth={visibleMonth} />
         <div className="days">
@@ -183,7 +162,9 @@ export function Calendar() {
                   className="add-event-btn"
                   onClick={() => {
                     setSelectedDay(format(date, "L-d-yyyy"));
-                    setAddDeleteModalIsOpen(val => !val);
+                    setSelectedModal("add-delete");
+                    setModalIsOpen(true);
+                    setSelectedEvent(initialEvent);
                   }}
                 >
                   +
@@ -202,12 +183,13 @@ export function Calendar() {
                     }) => (
                       <Event
                         key={crypto.randomUUID()}
+                        modalIsOpen={modalIsOpen}
                         event={d}
                         date={date}
-                        setEventsModalIsOpen={setEventsModalIsOpen}
-                        setAddDeleteModalIsOpen={setAddDeleteModalIsOpen}
                         setSelectedEvent={setSelectedEvent}
                         setSelectedDay={setSelectedDay}
+                        setSelectedModal={setSelectedModal}
+                        setModalIsOpen={setModalIsOpen}
                       />
                     )
                   )}
@@ -217,7 +199,8 @@ export function Calendar() {
                   className="events-view-more-btn"
                   onClick={() => {
                     setSelectedDay(format(date, "L-d-yyyy"));
-                    setEventsModalIsOpen((val: boolean) => !val);
+                    setSelectedModal("events");
+                    setModalIsOpen(true);
                   }}
                   ref={plusMoreRef}
                 >

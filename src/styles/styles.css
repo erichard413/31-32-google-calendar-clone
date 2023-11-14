@@ -60,14 +60,6 @@ body {
 .btn:hover {
   background-color: #f1f3f4;
 }
-.btn.btn-success:disabled {
-  background-color: gray;
-  opacity: 0.2;
-}
-.btn.btn-success:disabled:hover {
-  background-color: gray;
-  opacity: 0.2;
-}
 
 .btn.btn-delete {
   border-color: hsl(0, 75%, 60%);
@@ -305,10 +297,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
 }
 
-#modal-div .modal .overlay {
+.modal .overlay {
   background-color: transparent;
   width: 100%;
   height: 100%;
@@ -316,7 +307,7 @@ body {
   animation: fade-in 250ms forwards;
 }
 
-#modal-div .modal.closing .overlay {
+.modal.closing .overlay {
   animation: fade-in 250ms forwards reverse;
 }
 
@@ -326,7 +317,7 @@ body {
   }
 }
 
-#modal-div .modal .modal-body {
+.modal .modal-body {
   background-color: white;
   border-radius: 0.5rem;
   padding: 1rem;
@@ -337,8 +328,9 @@ body {
   scale: 0;
 }
 
-#modal-div .modal.closing .modal-body {
-  animation: pop-in 250ms forwards reverse;
+.modal.closing .modal-body {
+  animation: pop-in 250ms forwards;
+  animation-direction: reverse;
 }
 
 @keyframes pop-in {
