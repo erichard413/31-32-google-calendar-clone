@@ -187,7 +187,10 @@ export function AddDeleteForm({
           <button
             className="btn btn-delete"
             type="button"
-            onClick={() => handleDelete(formData.id, selectedDay)}
+            onClick={() => {
+              handleDelete(formData.id, selectedDay);
+              onClose();
+            }}
           >
             Delete
           </button>
