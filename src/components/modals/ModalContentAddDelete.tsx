@@ -28,7 +28,11 @@ export function ModalContentAddDelete({
   return (
     <>
       <div className="modal-title">
-        <div>Add Event</div>
+        {Object.keys(event).length > 0 ? (
+          <div>Edit Event</div>
+        ) : (
+          <div>Add Event</div>
+        )}
         <small>{selectedDay.replaceAll("-", "/")}</small>
         <button className="close-btn" onClick={() => onClose()}>
           &times;

@@ -286,6 +286,7 @@ body {
   color: #555;
   cursor: pointer;
   width: 100%;
+  font-size: 0.6em;
 }
 
 .modal {

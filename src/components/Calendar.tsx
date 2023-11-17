@@ -74,10 +74,6 @@ export function Calendar() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (!modalIsOpen) setSelectedEvent(initialEvent);
-  // }, [modalIsOpen]);
-
   function handleModalClose() {
     setModalIsOpen(val => !val);
   }
@@ -144,7 +140,7 @@ export function Calendar() {
       <div className="calendar">
         <Header setVisibleMonth={setVisibleMonth} visibleMonth={visibleMonth} />
         <div className="days">
-          {visibleDates.map(date => (
+          {visibleDates.map((date, index) => (
             <div
               className={`day ${
                 isSameMonth(date, visibleMonth) ? "" : "non-month-day"
@@ -154,7 +150,9 @@ export function Calendar() {
               key={date.toString()}
             >
               <div className="day-header">
-                <div className="week-name">{format(date, "ccc")}</div>
+                {index < 7 && (
+                  <div className="week-name">{format(date, "ccc")}</div>
+                )}
                 <div className={`day-number ${isToday(date) ? "today" : ""}`}>
                   {getDate(date)}
                 </div>
@@ -204,7 +202,7 @@ export function Calendar() {
                   }}
                   ref={plusMoreRef}
                 >
-                  +{events.length} More
+                  +{events[format(date, "L-d-yyyy")]?.length - numEvents} More
                 </button>
               ) : null}
             </div>
